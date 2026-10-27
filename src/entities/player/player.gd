@@ -38,12 +38,11 @@ func reset_to_idle() -> void:
 	if health_comp:
 		health_comp.set_invulnerable(false)
 	if hitbox:
-		hitbox.monitoring = false
+		hitbox.set_active(false)
 
 func _ready() -> void:
 	hitbox.attacker_owner = self
-	hitbox.monitoring = false
-	hitbox.monitorable = true
+	hitbox.set_active(false)
 	
 	health_comp.damaged.connect(_on_health_damaged)
 	health_comp.died.connect(_on_health_died)
@@ -89,6 +88,18 @@ func _handle_movement(delta: float) -> void:
 	var input_vector := Vector2.ZERO
 	input_vector.x = Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
 	input_vector.y = Input.get_action_strength("move_down") - Input.get_action_strength("move_up")
+	
+	# Reliable key fallback
+	if input_vector == Vector2.ZERO:
+		if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
+			input_vector.x += 1.0
+		if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):
+			input_vector.x -= 1.0
+		if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN):
+			input_vector.y += 1.0
+		if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP):
+			input_vector.y -= 1.0
+	
 	input_vector = input_vector.normalized()
 	
 	if input_vector != Vector2.ZERO:
@@ -100,7 +111,7 @@ func _handle_movement(delta: float) -> void:
 
 func _handle_combat_inputs() -> void:
 	# Dodge Roll
-	if Input.is_action_just_pressed("dodge"):
+	if Input.is_action_just_pressed("dodge") or Input.is_key_pressed(KEY_SPACE):
 		if stamina_comp.can_afford(dodge_stamina_cost):
 			stamina_comp.consume(dodge_stamina_cost)
 			_start_dodge()
@@ -109,14 +120,14 @@ func _handle_combat_inputs() -> void:
 			EventBus.combat_log_message.emit("Not enough stamina to dodge!")
 	
 	# Parry (Q)
-	if Input.is_action_just_pressed("parry"):
+	if Input.is_action_just_pressed("parry") or Input.is_key_pressed(KEY_Q):
 		if stamina_comp.can_afford(parry_stamina_cost):
 			stamina_comp.consume(parry_stamina_cost)
 			_start_parry()
 			return
 	
 	# Guard (Shift/E)
-	if Input.is_action_pressed("guard"):
+	if Input.is_action_pressed("guard") or Input.is_key_pressed(KEY_E) or Input.is_key_pressed(KEY_SHIFT):
 		_start_guard()
 		return
 	
@@ -177,7 +188,7 @@ func _start_light_attack() -> void:
 	velocity = facing_direction * 60.0 # Small lunge
 	hitbox.damage = 18.0 + (combo_index * 4.0)
 	hitbox.poise_damage = 15.0
-	hitbox.monitoring = true
+	hitbox.set_active(true)
 	_animate_swing()
 	EventBus.combat_log_message.emit("Light Attack #" + str(combo_index) + " executed.")
 	combo_index = (combo_index % 3) + 1
@@ -186,7 +197,7 @@ func _process_attack_light(delta: float) -> void:
 	state_timer -= delta
 	velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
 	if state_timer <= 0.0:
-		hitbox.monitoring = false
+		hitbox.set_active(false)
 		current_state = State.IDLE
 
 func _start_heavy_attack() -> void:
@@ -207,14 +218,14 @@ func _process_attack_heavy(delta: float) -> void:
 			var charge_factor: float = clampf(heavy_charge_timer / 1.0, 0.5, 1.5)
 			hitbox.damage = 45.0 * charge_factor
 			hitbox.poise_damage = 40.0 * charge_factor
-			hitbox.monitoring = true
+			hitbox.set_active(true)
 			_animate_heavy_swing()
 			EventBus.combat_log_message.emit("HEAVY SMASH unleashed! Damage: " + str(snapped(hitbox.damage, 0.1)))
 	else:
 		state_timer -= delta
 		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
 		if state_timer <= 0.0:
-			hitbox.monitoring = false
+			hitbox.set_active(false)
 			current_state = State.IDLE
 
 func _process_stagger(delta: float) -> void:

@@ -25,7 +25,7 @@ var _target_player: Node2D = null
 
 func _ready() -> void:
 	hitbox.attacker_owner = self
-	hitbox.monitoring = false
+	hitbox.set_active(false)
 	telegraph_ring.visible = false
 	stagger_icon.visible = false
 	
@@ -45,13 +45,25 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if health_comp.is_dead or is_staggered:
 		velocity = Vector2.ZERO
+		move_and_slide()
 		return
 	
 	_find_player()
 	
 	if _target_player:
+		var dist := global_position.distance_to(_target_player.global_position)
 		var dir := (_target_player.global_position - global_position).normalized()
 		attack_pivot.rotation = dir.angle()
+		
+		# Move towards player if outside melee range
+		if not _is_telegraphing and dist > 60.0:
+			velocity = dir * 75.0
+		else:
+			velocity = Vector2.ZERO
+	else:
+		velocity = Vector2.ZERO
+	
+	move_and_slide()
 	
 	if _is_telegraphing:
 		_telegraph_timer -= delta
@@ -74,10 +86,16 @@ func _find_player() -> void:
 			_target_player = players[0]
 
 func _start_telegraph() -> void:
-	_is_telegraphing = true
-	_telegraph_timer = telegraph_duration
-	telegraph_ring.visible = true
-	EventBus.combat_log_message.emit("Enemy telegraphing strike! Get ready to Dodge or Parry!")
+	if not _target_player:
+		return
+	var dist := global_position.distance_to(_target_player.global_position)
+	if dist <= 80.0:
+		_is_telegraphing = true
+		_telegraph_timer = telegraph_duration
+		telegraph_ring.visible = true
+		EventBus.combat_log_message.emit("Enemy telegraphing strike! Get ready to Dodge or Parry!")
+	else:
+		_attack_timer = 0.5
 
 func _execute_attack() -> void:
 	_is_telegraphing = false
@@ -88,14 +106,14 @@ func _execute_attack() -> void:
 	hitbox.damage = 25.0
 	hitbox.poise_damage = 30.0
 	hitbox.is_parryable = true
-	hitbox.monitoring = true
+	hitbox.set_active(true)
 	
 	var tween := create_tween()
 	attack_pivot.rotation -= 1.0
 	tween.tween_property(attack_pivot, "rotation", attack_pivot.rotation + 2.0, 0.15)
 	
 	await get_tree().create_timer(0.2).timeout
-	hitbox.monitoring = false
+	hitbox.set_active(false)
 
 func _on_hit_received(incoming: HitboxComponent) -> void:
 	# Flash white
