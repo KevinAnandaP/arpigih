@@ -29,7 +29,7 @@ func _sync_hp(cur: float, mx: float) -> void:
 	EventBus.player_damaged.emit(cur, mx, 0.0)
 
 func _input(event: InputEvent) -> void:
-	if event.is_action_just_pressed("pause"):
+	if event.is_action_pressed("pause") and not event.is_echo():
 		GameState.toggle_pause()
 
 func _on_game_paused(paused: bool) -> void:
