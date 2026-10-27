@@ -1,0 +1,183 @@
+[gd_scene format=3 uid="uid://df7w81vkeoqpt"]
+
+[ext_resource type="Script" path="res://src/ui/hud.gd" id="1_hud"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_bg"]
+bg_color = Color(0.15, 0.05, 0.05, 0.8)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
+bg_color = Color(0.85, 0.15, 0.15, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stam_bg"]
+bg_color = Color(0.05, 0.15, 0.05, 0.8)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stam_fill"]
+bg_color = Color(0.2, 0.8, 0.35, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mana_bg"]
+bg_color = Color(0.05, 0.08, 0.18, 0.8)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mana_fill"]
+bg_color = Color(0.2, 0.55, 0.95, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_log_panel"]
+bg_color = Color(0.02, 0.02, 0.03, 0.6)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.2, 0.3, 0.4)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_hud")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TopLeft" type="MarginContainer" parent="Root"]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = 212.0
+offset_bottom = 80.0
+
+[node name="VBox" type="VBoxContainer" parent="Root/TopLeft"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="HPContainer" type="Control" parent="Root/TopLeft/VBox"]
+custom_minimum_size = Vector2(180, 14)
+layout_mode = 2
+
+[node name="HPBar" type="ProgressBar" parent="Root/TopLeft/VBox/HPContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_hp_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
+value = 100.0
+show_percentage = false
+
+[node name="HPLabel" type="Label" parent="Root/TopLeft/VBox/HPContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 9
+text = "HP: 100 / 100"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StaminaContainer" type="Control" parent="Root/TopLeft/VBox"]
+custom_minimum_size = Vector2(160, 10)
+layout_mode = 2
+
+[node name="StaminaBar" type="ProgressBar" parent="Root/TopLeft/VBox/StaminaContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_stam_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_stam_fill")
+value = 100.0
+show_percentage = false
+
+[node name="ManaContainer" type="Control" parent="Root/TopLeft/VBox"]
+custom_minimum_size = Vector2(140, 8)
+layout_mode = 2
+
+[node name="ManaBar" type="ProgressBar" parent="Root/TopLeft/VBox/ManaContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_mana_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_mana_fill")
+value = 100.0
+show_percentage = false
+
+[node name="BottomLeft" type="MarginContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = -90.0
+offset_right = 320.0
+offset_bottom = -26.0
+grow_vertical = 0
+
+[node name="CombatLog" type="PanelContainer" parent="Root/BottomLeft"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_log_panel")
+
+[node name="LogLabel" type="Label" parent="Root/BottomLeft/CombatLog"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.88, 0.95, 0.9)
+theme_override_font_sizes/font_size = 8
+text = "Ready for battle."
+vertical_alignment = 2
+
+[node name="BottomCenter" type="MarginContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -22.0
+offset_right = 300.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="ControlsHint" type="Label" parent="Root/BottomCenter"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.7, 0.8, 0.85)
+theme_override_font_sizes/font_size = 9
+text = "[WASD] Move  |  [LMB] Light Attack Combo  |  [RMB] Heavy Smash  |  [SPACE] Dodge Roll  |  [Q] Parry  |  [E/Shift] Guard"
+horizontal_alignment = 1
