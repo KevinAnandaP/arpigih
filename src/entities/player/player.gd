@@ -32,6 +32,14 @@ var combo_index: int = 1
 var is_charging_heavy: bool = false
 var heavy_charge_timer: float = 0.0
 
+func reset_to_idle() -> void:
+	current_state = State.IDLE
+	velocity = Vector2.ZERO
+	if health_comp:
+		health_comp.set_invulnerable(false)
+	if hitbox:
+		hitbox.monitoring = false
+
 func _ready() -> void:
 	hitbox.attacker_owner = self
 	hitbox.monitoring = false
