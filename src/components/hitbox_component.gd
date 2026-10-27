@@ -13,4 +13,8 @@ func _ready() -> void:
 	collision_layer = 4 # Hitbox layer
 	collision_mask = 0  # Does not detect, hurtbox detects hitbox
 	monitoring = false
-	monitorable = true
+	monitorable = false # Inactive until activated by an attack action
+
+func set_active(active: bool) -> void:
+	monitoring = active
+	monitorable = active

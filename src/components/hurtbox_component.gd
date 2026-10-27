@@ -16,6 +16,13 @@ func _ready() -> void:
 func _on_area_entered(area: Area2D) -> void:
 	if area is HitboxComponent:
 		var hitbox := area as HitboxComponent
+		# Ignore self damage and friendly hits
+		if hitbox.attacker_owner == owner or hitbox.attacker_owner == get_parent() or hitbox.attacker_owner == self:
+			return
+		
+		# Only take damage if hitbox is currently active
+		if not hitbox.monitorable:
+			return
 		emit_signal("hit_received", hitbox)
 		
 		# Apply damage to health
