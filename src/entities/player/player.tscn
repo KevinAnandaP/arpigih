@@ -1,0 +1,82 @@
+[gd_scene format=3 uid="uid://c7pl8xqw20yva"]
+
+[ext_resource type="Script" path="res://src/entities/player/player.gd" id="1_player"]
+[ext_resource type="Script" path="res://src/components/health_component.gd" id="2_health"]
+[ext_resource type="Script" path="res://src/components/stamina_component.gd" id="3_stamina"]
+[ext_resource type="Script" path="res://src/components/mana_component.gd" id="4_mana"]
+[ext_resource type="Script" path="res://src/components/hurtbox_component.gd" id="5_hurtbox"]
+[ext_resource type="Script" path="res://src/components/hitbox_component.gd" id="6_hitbox"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 10.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sword"]
+size = Vector2(28, 16)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hurt"]
+radius = 12.0
+
+[node name="Player" type="CharacterBody2D"]
+collision_layer = 1
+collision_mask = 2
+script = ExtResource("1_player")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_body")
+
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="Body" type="Polygon2D" parent="Visual"]
+color = Color(0.2, 0.45, 0.85, 1)
+polygon = PackedVector2Array(-8, -12, 8, -12, 10, 8, -10, 8)
+
+[node name="Head" type="Polygon2D" parent="Visual"]
+color = Color(0.85, 0.9, 1, 1)
+polygon = PackedVector2Array(-5, -20, 5, -20, 6, -12, -6, -12)
+
+[node name="Cape" type="Polygon2D" parent="Visual"]
+color = Color(0.7, 0.15, 0.2, 1)
+polygon = PackedVector2Array(-7, -8, -12, 12, -2, 10, -5, -6)
+
+[node name="WeaponPivot" type="Node2D" parent="."]
+
+[node name="Blade" type="Polygon2D" parent="WeaponPivot"]
+color = Color(0.9, 0.95, 1, 1)
+polygon = PackedVector2Array(6, -3, 26, -2, 28, 0, 26, 2, 6, 3)
+
+[node name="Hilt" type="Polygon2D" parent="WeaponPivot"]
+color = Color(0.7, 0.6, 0.2, 1)
+polygon = PackedVector2Array(4, -6, 6, -6, 6, 6, 4, 6)
+
+[node name="HitboxComponent" type="Area2D" parent="WeaponPivot"]
+position = Vector2(18, 0)
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("6_hitbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WeaponPivot/HitboxComponent"]
+shape = SubResource("RectangleShape2D_sword")
+
+[node name="HurtboxComponent" type="Area2D" parent="." node_paths=PackedStringArray("health_comp")]
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("5_hurtbox")
+health_comp = NodePath("../HealthComponent")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtboxComponent"]
+shape = SubResource("CircleShape2D_hurt")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("2_health")
+max_health = 100.0
+
+[node name="StaminaComponent" type="Node" parent="."]
+script = ExtResource("3_stamina")
+max_stamina = 100.0
+regen_rate = 40.0
+
+[node name="ManaComponent" type="Node" parent="."]
+script = ExtResource("4_mana")
+max_mana = 100.0
+
+[node name="ParrySpark" type="Node2D" parent="."]
